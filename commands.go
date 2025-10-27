@@ -35,7 +35,7 @@ func commandMap(config *pokeapi.Config) error {
 		url := pokeapi.BaseURL + "/location-area"
 		config.Next = &url
 	}
-	locations, err := pokeapi.GetLocationAreas(config.Next)
+	locations, err := config.GetLocationAreas(config.Next)
 	if err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ func commandMapB(config *pokeapi.Config) error {
 		fmt.Println("you're on the first page")
 		return nil
 	}
-	locations, err := pokeapi.GetLocationAreas(config.Previous)
+	locations, err := config.GetLocationAreas(config.Previous)
 	if err != nil {
 		return err
 	}

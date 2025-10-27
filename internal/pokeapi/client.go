@@ -33,34 +33,49 @@ type Client struct {
 	cache  *pokecache.Cache
 }
 
-// Generic Get request wrapper
-func Get(urlPath *string) ([]byte, error) {
-	response, err := http.Get(*urlPath)
-	if err != nil {
-		return nil, err
+func (c *Config) GetLocationAreas(pageURL *string) (LocationAreas, error) {
+	var url string
+	if pageURL != nil {
+		url = *pageURL
 	}
-	defer response.Body.Close()
 
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		return nil, err
+	// Check the Cache for the data
+	if val, ok := c.PClient.cache.Get(url); ok {
+		locations := LocationAreas{}
+		err := json.Unmarshal(val, &locations)
+		if err != nil {
+			return LocationAreas{}, err
+		}
+		return locations, nil
 	}
-	return body, nil
-}
 
-func GetLocationAreas(url *string) (LocationAreas, error) {
-	jsonData, err := Get(url)
+	// If no cache data found, make the request.
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return LocationAreas{}, err
 	}
 
-	var locations LocationAreas
-	if err := json.Unmarshal(jsonData, &locations); err != nil {
+	// Handle the response
+	resp, err := c.PClient.client.Do(req)
+	if err != nil {
+		return LocationAreas{}, err
+	}
+	defer resp.Body.Close()
+
+	// Handle the data
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
 		return LocationAreas{}, err
 	}
 
+	locations := LocationAreas{}
+	err = json.Unmarshal(data, &locations)
+	if err != nil {
+		return LocationAreas{}, err
+	}
+
+	c.PClient.cache.Add(url, data)
 	return locations, nil
-
 }
 
 func NewClient(timeout, cacheInterval time.Duration) Client {
