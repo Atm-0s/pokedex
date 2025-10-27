@@ -33,7 +33,7 @@ func runREPL() {
 		PClient: pokeapi.NewClient(5*time.Minute, 10*time.Second),
 		Pokedex: make(map[string]pokeapi.Pokemon),
 	}
-
+	fmt.Println("Type help for a list of commands.")
 	for {
 		fmt.Print("Pokedex > ")
 		if input.Scan() {
@@ -84,7 +84,7 @@ func getCommands() map[string]cliCommand {
 		},
 		"mapb": {
 			name:        "mapb",
-			description: "Displays the previous 20 locations listed paged through by map command.",
+			description: "Displays the previous 20 locations listed and paged through by map command.",
 			callback:    commandMapB,
 		},
 		"explore": {
@@ -99,12 +99,12 @@ func getCommands() map[string]cliCommand {
 		},
 		"inspect": {
 			name:        "inspect",
-			description: "Inspect caught pokemon",
+			description: "Inspect caught pokemon.",
 			callback:    commandInspect,
 		},
 		"pokedex": {
-			name:        "inspect",
-			description: "List the pokemon in your pokedex",
+			name:        "pokedex",
+			description: "List the pokemon in your pokedex.",
 			callback:    commandPokedex,
 		},
 	}
