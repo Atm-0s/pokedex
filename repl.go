@@ -20,16 +20,18 @@ func cleanInput(text string) []string {
 
 /*
 The main logic for the Read, Evaluate, Print, Loop
-Creates a new cache
+Creates config which creates a client which creates a cache
 inf loop
 reads the input and handle errors
 grabs the command and executes
 loop back
 */
+
 func runREPL() {
 	input := bufio.NewScanner(os.Stdin)
 	config := &pokeapi.Config{
-		PClient: pokeapi.NewClient(5*time.Minute, 5*time.Second),
+		PClient: pokeapi.NewClient(5*time.Minute, 10*time.Second),
+		Pokedex: make(map[string]pokeapi.Pokemon),
 	}
 
 	for {
@@ -41,13 +43,17 @@ func runREPL() {
 				continue
 			}
 			commandName := cleanText[0]
+			var commandArgument *string
+			if len(cleanText) > 1 {
+				commandArgument = &cleanText[1]
+			}
 
 			command, ok := getCommands()[commandName]
 			if !ok {
 				fmt.Println("Unknown command")
 				continue
 			} else {
-				err := command.callback(config)
+				err := command.callback(config, commandArgument)
 				if err != nil {
 					fmt.Print(err)
 				}
@@ -63,12 +69,12 @@ func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
 		"help": {
 			name:        "help",
-			description: "Displays a help message",
+			description: "Displays a help message.",
 			callback:    commandHelp,
 		},
 		"exit": {
 			name:        "exit",
-			description: "Exit the Pokedex",
+			description: "Exit the Pokedex.",
 			callback:    commandExit,
 		},
 		"map": {
@@ -80,6 +86,26 @@ func getCommands() map[string]cliCommand {
 			name:        "mapb",
 			description: "Displays the previous 20 locations listed paged through by map command.",
 			callback:    commandMapB,
+		},
+		"explore": {
+			name:        "explore",
+			description: "Takes a location area as an argument and displays a list of pokemon encountered in that area.",
+			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Attempt to catch a pokemon and add it to the pokedex.",
+			callback:    commandCatch,
+		},
+		"inspect": {
+			name:        "inspect",
+			description: "Inspect caught pokemon",
+			callback:    commandInspect,
+		},
+		"pokedex": {
+			name:        "inspect",
+			description: "List the pokemon in your pokedex",
+			callback:    commandPokedex,
 		},
 	}
 }
