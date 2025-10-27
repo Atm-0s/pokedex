@@ -1,11 +1,15 @@
 package main
 
 import (
+	"Atm-0s/pokedex/internal/pokeapi"
 	"bufio"
 	"fmt"
 	"os"
 	"strings"
+	"time"
 )
+
+// Take Smiley's advice and go through and comment everything!
 
 func cleanInput(text string) []string {
 
@@ -15,6 +19,10 @@ func cleanInput(text string) []string {
 
 func runREPL() {
 	input := bufio.NewScanner(os.Stdin)
+	config := &pokeapi.Config{
+		PClient: pokeapi.NewClient(5*time.Minute, 5*time.Second),
+	}
+
 	for {
 		fmt.Print("Pokedex > ")
 		if input.Scan() {
@@ -30,7 +38,7 @@ func runREPL() {
 				fmt.Println("Unknown command")
 				continue
 			} else {
-				err := command.callback()
+				err := command.callback(config)
 				if err != nil {
 					fmt.Print(err)
 				}
@@ -52,6 +60,16 @@ func getCommands() map[string]cliCommand {
 			name:        "exit",
 			description: "Exit the Pokedex",
 			callback:    commandExit,
+		},
+		"map": {
+			name:        "map",
+			description: "Displays a list of 20 location areas per page. Multiple uses will display the next 20.",
+			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Displays the previous 20 locations listed paged through by map command.",
+			callback:    commandMapB,
 		},
 	}
 }
