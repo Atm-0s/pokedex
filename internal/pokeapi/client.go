@@ -33,6 +33,7 @@ type Client struct {
 	cache  *pokecache.Cache
 }
 
+// *Config method that takes a url as input and returns a list of location areas
 func (c *Config) GetLocationAreas(pageURL *string) (LocationAreas, error) {
 	var url string
 	if pageURL != nil {
@@ -74,10 +75,12 @@ func (c *Config) GetLocationAreas(pageURL *string) (LocationAreas, error) {
 		return LocationAreas{}, err
 	}
 
+	// Add the data to the cache then return it
 	c.PClient.cache.Add(url, data)
 	return locations, nil
 }
 
+// Create a new pokeapi.Client struct using inputted timeout and interval durations
 func NewClient(timeout, cacheInterval time.Duration) Client {
 	return Client{
 		cache: pokecache.NewCache(cacheInterval),

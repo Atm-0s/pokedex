@@ -11,12 +11,21 @@ import (
 
 // Take Smiley's advice and go through and comment everything!
 
+// Cleans the input to only use the first word in lower case
 func cleanInput(text string) []string {
 
 	wordSlice := strings.Fields(strings.ToLower(text))
 	return wordSlice
 }
 
+/*
+The main logic for the Read, Evaluate, Print, Loop
+Creates a new cache
+inf loop
+reads the input and handle errors
+grabs the command and executes
+loop back
+*/
 func runREPL() {
 	input := bufio.NewScanner(os.Stdin)
 	config := &pokeapi.Config{
@@ -49,6 +58,7 @@ func runREPL() {
 	}
 }
 
+// A map of the commands with descriptions
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
 		"help": {
